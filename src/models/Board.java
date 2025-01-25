@@ -6,14 +6,22 @@ import java.util.List;
 public class Board {
     private Piece[][] squares;
     private List<Move> moveHistory;
+    private static Board boardInstance;
 
-    public Board() {
+    private Board() {
         squares = new Piece[8][8];
         moveHistory = new ArrayList<>();
         initializeBoard();
     }
 
-    private void initializeBoard() {
+    public static Board getBoardInstance() {
+        if (Board.boardInstance == null) {
+            Board.boardInstance = new Board();
+        }
+        return Board.boardInstance;
+    }
+
+    public void initializeBoard() {
         // Place pawns
         for (int col = 0; col < 8; col++) {
             squares[1][col] = new Piece(PieceType.PAWN, Color.WHITE, new Position(1, col));
@@ -40,6 +48,12 @@ public class Board {
         placePiece(7, 5, PieceType.BISHOP, Color.BLACK);
         placePiece(7, 6, PieceType.KNIGHT, Color.BLACK);
         placePiece(7, 7, PieceType.ROOK, Color.BLACK);
+
+        for (int row = 2; row < 6; row++) {
+            for (int col = 0; col < 8; col++) {
+                squares[row][col] = null;
+            }
+        }
     }
 
     private void placePiece(int row, int col, PieceType type, Color color) {

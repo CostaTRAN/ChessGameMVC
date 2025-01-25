@@ -27,10 +27,11 @@ public class GameModeSelectionView implements ChessView, Observer {
                 switch (choice) {
                     case 1:
                         System.out.println("Starting Player vs Player game...");
-                        Game game = new Game();
+                        Game game = Game.getGameInstance();
                         ConsoleChessView view = new ConsoleChessView(game);
                         game.addObserver(view);
                         game.removeObserver(this);
+                        game.getBoard().initializeBoard();
                         view.startGameLoop();
                         break;
                     case 2:

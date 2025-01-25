@@ -12,13 +12,21 @@ public class Game implements Subject {
     private List<String> moveNotation;
     private static String DEFAULT_SAVE_FILE = "chess_save.dat";
     private List<Observer> observers;
+    private static Game gameInstance;
 
-    public Game() {
-        this.board = new Board();
+    private Game() {
+        this.board = Board.getBoardInstance();
         this.currentTurn = Color.WHITE;
         this.status = GameStatus.ACTIVE;
         this.moveNotation = new ArrayList<>();
         this.observers = new ArrayList<>();
+    }
+
+    public static Game getGameInstance() {
+        if(Game.gameInstance == null) {
+            Game.gameInstance = new Game();
+        }
+        return Game.gameInstance;
     }
 
     public boolean makeMove(Position from, Position to) {

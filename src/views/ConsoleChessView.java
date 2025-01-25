@@ -124,6 +124,7 @@ public class ConsoleChessView implements ChessView, Observer {
                     game.removeObserver(this);
                     game.addObserver(new GameModeSelectionView());
                     game.notifyObservers();
+                    game = null;
                     return;
                 }
                 case "help" -> showHelp();
