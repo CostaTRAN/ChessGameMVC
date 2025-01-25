@@ -15,8 +15,8 @@ public class ChessController {
     private Game game;
     private ChessView view;
 
-    public ChessController(Game game, ChessView view) {
-        this.game = game;
+    public ChessController(ChessView view) {
+        this.game = Game.getGameInstance();
         this.view = view;
     }
 
@@ -74,7 +74,6 @@ public class ChessController {
                     PieceType promotionType = ((ConsoleChessView) view).askPromotionPawn();
                     game.promotePawn(to, promotionType);
                 }
-                view.updateBoard();
                 updateGameStatus();
             } else {
                 view.showError("Invalid move!");

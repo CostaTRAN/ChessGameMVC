@@ -2,13 +2,16 @@ package views;
 
 import java.util.Scanner;
 
+import controllers.ChessController;
 import models.Game;
 
 public class GameModeSelectionView implements ChessView, Observer {
 
+    private ChessController controller;
     private Scanner scanner;
 
     public GameModeSelectionView() {
+        this.controller = new ChessController(this);
         this.scanner = new Scanner(System.in);
     }
     
@@ -28,9 +31,9 @@ public class GameModeSelectionView implements ChessView, Observer {
                     case 1:
                         System.out.println("Starting Player vs Player game...");
                         Game game = Game.getGameInstance();
-                        ConsoleChessView view = new ConsoleChessView(game);
-                        game.addObserver(view);
+                        ConsoleChessView view = new ConsoleChessView(this.controller);
                         game.removeObserver(this);
+                        game.addObserver(view);
                         game.getBoard().initializeBoard();
                         view.startGameLoop();
                         break;
@@ -76,7 +79,7 @@ public class GameModeSelectionView implements ChessView, Observer {
 
     @Override
     public void update() {
-        clearScreen();
+        //clearScreen();
         showGameModeSelection();
     }
 }

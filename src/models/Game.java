@@ -3,6 +3,8 @@ package models;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import views.GameModeSelectionView;
 import views.Observer;
 
 public class Game implements Subject {
@@ -24,6 +26,7 @@ public class Game implements Subject {
 
     public static Game getGameInstance() {
         if(Game.gameInstance == null) {
+            System.out.println("DEBUG new game instance");
             Game.gameInstance = new Game();
         }
         return Game.gameInstance;
@@ -31,7 +34,8 @@ public class Game implements Subject {
 
     public boolean makeMove(Position from, Position to) {
         Piece piece = board.getPiece(from);
-        
+        System.out.println("DEBUG piece: " + piece);
+        System.out.println("DEBUG currentTurn: " + currentTurn);
         if (piece == null || piece.getColor() != currentTurn) {
             return false;
         }
@@ -56,7 +60,8 @@ public class Game implements Subject {
         // Switch turns and update game status
         switchTurn();
         updateGameStatus();
-        
+        notifyObservers();
+
         return true;
     }
 
@@ -74,6 +79,7 @@ public class Game implements Subject {
         
         if (board.isUnderAttack(kingPos, oppositeColor)) {
             status = GameStatus.CHECK;
+            
             if (isCheckmate()) {
                 status = GameStatus.CHECKMATE;
             }
@@ -158,12 +164,23 @@ public class Game implements Subject {
     }
 
     public void promotePawn(Position position, PieceType newType) {
-        Board board = getBoard();
+        Board board = Game.getGameInstance().getBoard();
         Piece pawn = board.getPiece(position);
         if (pawn.getType() == PieceType.PAWN) {
             Piece promotedPiece = new Piece(newType, pawn.getColor(), position);
             board.setPiece(position, promotedPiece);
         }
+    }
+
+    public void stopGame(Observer observer) {
+        removeObserver(observer);
+        addObserver(new GameModeSelectionView());
+        Game.resetGameInstance();
+        notifyObservers();
+    }
+
+    public static void resetGameInstance() {
+        Game.gameInstance = null;
     }
 
     @Override

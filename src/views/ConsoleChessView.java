@@ -10,6 +10,7 @@ import java.util.List;
 
 public class ConsoleChessView implements ChessView, Observer {
     private Game game;
+    private ChessController controller;
     private Scanner scanner;
     private static String ANSI_RESET = "\u001B[0m";
     private static String ANSI_WHITE = "\u001B[37m";
@@ -17,14 +18,15 @@ public class ConsoleChessView implements ChessView, Observer {
     private static String ANSI_WHITE_BACKGROUND = "\u001B[47m";
     private static String ANSI_GRAY_BACKGROUND = "\u001B[100m";
 
-    public ConsoleChessView(Game game) {
-        this.game = game;
+    public ConsoleChessView(ChessController controller) {
+        this.game = Game.getGameInstance();
+        this.controller = controller;
         this.scanner = new Scanner(System.in);
     }
 
     @Override
     public void updateBoard() {
-        clearScreen();
+        //clearScreen();
         printMoveHistory();
         printGameInfo();
         printBoard();
@@ -46,7 +48,7 @@ public class ConsoleChessView implements ChessView, Observer {
     }
 
     private void printBoard() {
-        Board board = game.getBoard();
+        Board board = Game.getGameInstance().getBoard();
         System.out.println("    a  b  c  d  e  f  g  h");
         System.out.println("  --------------------------");
         
@@ -109,8 +111,7 @@ public class ConsoleChessView implements ChessView, Observer {
     }
 
     public void startGameLoop() {
-        ChessController controller = new ChessController(game, this);
-        game.notifyObservers();
+        updateBoard();
 
         while (game.getStatus() != GameStatus.CHECKMATE && 
                game.getStatus() != GameStatus.STALEMATE) {
@@ -121,16 +122,12 @@ public class ConsoleChessView implements ChessView, Observer {
             switch (input) {
                 case "quit", "exit" -> {
                     System.out.println("Game ended by player.");
-                    game.removeObserver(this);
-                    game.addObserver(new GameModeSelectionView());
-                    game.notifyObservers();
-                    game = null;
+                    game.stopGame(this);
                     return;
                 }
                 case "help" -> showHelp();
                 case "undo" -> {
                     game.undoMove();
-                    game.notifyObservers();
                 }
                 case "save" -> {
                     try {
@@ -145,7 +142,6 @@ public class ConsoleChessView implements ChessView, Observer {
                         game = Game.loadGame();
                         showMessage("Game loaded successfully!");
                         // Update game reference and refresh view
-                        game.notifyObservers();
                     } catch (Exception e) {
                         showError("Failed to load game: " + e.getMessage());
                     }
@@ -155,7 +151,6 @@ public class ConsoleChessView implements ChessView, Observer {
         }
 
         // Game over
-        game.notifyObservers();
         printGameOverMessage();
     }
 
