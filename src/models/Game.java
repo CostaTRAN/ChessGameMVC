@@ -26,7 +26,6 @@ public class Game implements Subject {
 
     public static Game getGameInstance() {
         if(Game.gameInstance == null) {
-            System.out.println("DEBUG new game instance");
             Game.gameInstance = new Game();
         }
         return Game.gameInstance;
@@ -34,8 +33,6 @@ public class Game implements Subject {
 
     public boolean makeMove(Position from, Position to) {
         Piece piece = board.getPiece(from);
-        System.out.println("DEBUG piece: " + piece);
-        System.out.println("DEBUG currentTurn: " + currentTurn);
         if (piece == null || piece.getColor() != currentTurn) {
             return false;
         }
@@ -158,6 +155,7 @@ public class Game implements Subject {
         board.undoLastMove();
         switchTurn();
         updateGameStatus();
+        notifyObservers();
         if (!moveNotation.isEmpty()) {
             moveNotation.remove(moveNotation.size() - 1);
         }

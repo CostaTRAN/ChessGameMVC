@@ -4,13 +4,12 @@ import models.*;
 
 import java.util.Scanner;
 
-import controllers.ChessController;
+import controllers.GameController;
 
 import java.util.List;
 
-public class ConsoleChessView implements ChessView, Observer {
-    private Game game;
-    private ChessController controller;
+public class GameView implements ChessView, Observer {
+    private GameController gameController;
     private Scanner scanner;
     private static String ANSI_RESET = "\u001B[0m";
     private static String ANSI_WHITE = "\u001B[37m";
@@ -18,13 +17,11 @@ public class ConsoleChessView implements ChessView, Observer {
     private static String ANSI_WHITE_BACKGROUND = "\u001B[47m";
     private static String ANSI_GRAY_BACKGROUND = "\u001B[100m";
 
-    public ConsoleChessView(ChessController controller) {
-        this.game = Game.getGameInstance();
-        this.controller = controller;
+    public GameView() {
+        this.gameController = new GameController(this);
         this.scanner = new Scanner(System.in);
     }
 
-    @Override
     public void updateBoard() {
         //clearScreen();
         printMoveHistory();
@@ -40,9 +37,9 @@ public class ConsoleChessView implements ChessView, Observer {
     private void printGameInfo() {
         System.out.println("\nChess Game");
         System.out.println("==========");
-        System.out.println("Current turn: " + game.getCurrentTurn());
-        if (game.getStatus() != GameStatus.ACTIVE) {
-            System.out.println("Game Status: " + game.getStatus());
+        System.out.println("Current turn: " + Game.getGameInstance().getCurrentTurn());
+        if (Game.getGameInstance().getStatus() != GameStatus.ACTIVE) {
+            System.out.println("Game Status: " + Game.getGameInstance().getStatus());
         }
         System.out.println();
     }
@@ -91,7 +88,7 @@ public class ConsoleChessView implements ChessView, Observer {
     }
 */
     private void printMoveHistory() {
-        List<String> notation = game.getMoveNotation();
+        List<String> notation = Game.getGameInstance().getMoveNotation();
         if (!notation.isEmpty()) {
             System.out.println("\nMove History:");
             for (String move : notation) {
@@ -100,21 +97,11 @@ public class ConsoleChessView implements ChessView, Observer {
         }
     }
 
-    @Override
-    public void showMessage(String message) {
-        System.out.println("\n" + message);
-    }
-
-    @Override
-    public void showError(String message) {
-        System.err.println("\nError: " + message);
-    }
-
     public void startGameLoop() {
         updateBoard();
 
-        while (game.getStatus() != GameStatus.CHECKMATE && 
-               game.getStatus() != GameStatus.STALEMATE) {
+        while (Game.getGameInstance().getStatus() != GameStatus.CHECKMATE && 
+            Game.getGameInstance().getStatus() != GameStatus.STALEMATE) {
             
             System.out.print("\nEnter command (move: 'e2 e4', or type 'help'): ");
             String input = scanner.nextLine().trim().toLowerCase();
@@ -122,16 +109,16 @@ public class ConsoleChessView implements ChessView, Observer {
             switch (input) {
                 case "quit", "exit" -> {
                     System.out.println("Game ended by player.");
-                    game.stopGame(this);
+                    Game.getGameInstance().stopGame(this);
                     return;
                 }
                 case "help" -> showHelp();
                 case "undo" -> {
-                    game.undoMove();
+                    Game.getGameInstance().undoMove();
                 }
                 case "save" -> {
                     try {
-                        game.saveGame();
+                        Game.getGameInstance().saveGame();
                         showMessage("Game saved successfully!");
                     } catch (Exception e) {
                         showError("Failed to save game: " + e.getMessage());
@@ -139,33 +126,19 @@ public class ConsoleChessView implements ChessView, Observer {
                 }
                 case "load" -> {
                     try {
-                        game = Game.loadGame();
+                        Game.getGameInstance().loadGame();
                         showMessage("Game loaded successfully!");
                         // Update game reference and refresh view
                     } catch (Exception e) {
                         showError("Failed to load game: " + e.getMessage());
                     }
                 }
-                default -> controller.handleCommand(input);
+                default -> gameController.handleCommand(input);
             }
         }
 
         // Game over
         printGameOverMessage();
-    }
-
-    private void showHelp() {
-        System.out.println("\nAvailable commands:");
-        System.out.println("- Move a piece: e2 e4 (from square to square)");
-        System.out.println("- Undo last move: undo");
-        System.out.println("- Save game: save");
-        System.out.println("- Load game: load");
-        System.out.println("- Show this help: help");
-        System.out.println("- Quit game: quit or exit");
-        System.out.println("\nSquare notation:");
-        System.out.println("- Files (columns): a-h");
-        System.out.println("- Ranks (rows): 1-8");
-        System.out.println("Example: e2 e4 moves the piece from e2 to e4");
     }
 
     public PieceType askPromotionPawn() {
@@ -196,10 +169,10 @@ public class ConsoleChessView implements ChessView, Observer {
 
     private void printGameOverMessage() {
         System.out.println("\nGame Over!");
-        if (game.getStatus() == GameStatus.CHECKMATE) {
-            Color winner = game.getCurrentTurn() == Color.WHITE ? Color.BLACK : Color.WHITE;
+        if (Game.getGameInstance().getStatus() == GameStatus.CHECKMATE) {
+            Color winner = Game.getGameInstance().getCurrentTurn() == Color.WHITE ? Color.BLACK : Color.WHITE;
             System.out.println("Checkmate! " + winner + " wins!");
-        } else if (game.getStatus() == GameStatus.STALEMATE) {
+        } else if (Game.getGameInstance().getStatus() == GameStatus.STALEMATE) {
             System.out.println("Stalemate! The game is a draw.");
         }
     }
@@ -207,5 +180,30 @@ public class ConsoleChessView implements ChessView, Observer {
     @Override
     public void update() {
         updateBoard();
+    }
+
+    @Override
+    public void showHelp() {
+        System.out.println("\nAvailable commands:");
+        System.out.println("- Move a piece: e2 e4 (from square to square)");
+        System.out.println("- Undo last move: undo");
+        System.out.println("- Save game: save");
+        System.out.println("- Load saved game: load");
+        System.out.println("- Show this help: help");
+        System.out.println("- Quit game: quit or exit");
+        System.out.println("\nSquare notation:");
+        System.out.println("- Files (columns): a-h");
+        System.out.println("- Ranks (rows): 1-8");
+        System.out.println("Example: e2 e4 moves the piece from e2 to e4");
+    }
+
+    @Override
+    public void showMessage(String message) {
+        System.out.println("\n" + message);
+    }
+
+    @Override
+    public void showError(String message) {
+        System.err.println("\nError: " + message);
     }
 }
