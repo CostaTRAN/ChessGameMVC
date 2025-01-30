@@ -15,16 +15,16 @@ public class Move {
         this.isFirstMove = !piece.hasMoved();
     }
 
-    public Piece getPiece() { return piece; }
-    public Position getFrom() { return from; }
-    public Position getTo() { return to; }
-    public Piece getCapturedPiece() { return capturedPiece; }
-    public boolean isFirstMove() { return isFirstMove; }
+    public Piece getPiece() { return this.piece; }
+    public Position getFrom() { return this.from; }
+    public Position getTo() { return this.to; }
+    public Piece getCapturedPiece() { return this.capturedPiece; }
+    public boolean isFirstMove() { return this.isFirstMove; }
 
     @Override
     public String toString() {
         return String.format("%s%s-%s%s", 
-            piece.toString(), from.toString(), 
-            capturedPiece != null ? "x" : "", to.toString());
+            this.piece.toString(), this.from.toString(), 
+            this.capturedPiece != null ? "x" : "", this.to.toString());
     }
 }

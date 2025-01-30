@@ -1,6 +1,6 @@
 import views.GameModeSelectionView;
 
-public class ChessGame {
+public class Main {
     public static void main(String[] args) {
         new GameModeSelectionView().update();
     }

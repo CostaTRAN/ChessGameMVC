@@ -2,7 +2,6 @@ package controllers;
 
 import java.util.Scanner;
 
-import models.Board;
 import models.Game;
 import views.GameModeSelectionView;
 import views.GameView;
@@ -20,14 +19,14 @@ public class GameModeSelectionController {
     public void handleCommand() {
         boolean asking = true;
         while(asking) {
-            String command = scanner.nextLine().trim().toLowerCase();
+            String command = this.scanner.nextLine().trim().toLowerCase();
             switch (command) {
                 case "pvp":
                     this.view.showMessage("Starting Player vs Player game...");
                     GameView gameView = new GameView();
                     Game.getGameInstance().removeObserver(this.view);
                     Game.getGameInstance().addObserver(gameView);
-                    Board.getBoardInstance().initializeBoard();
+                    Game.getGameInstance().getBoard().initializeBoard();
                     gameView.startGameLoop();
                     asking = false;
                     break;

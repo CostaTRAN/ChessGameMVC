@@ -2,7 +2,6 @@ package models;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 
 import views.GameModeSelectionView;
 import views.Observer;
@@ -11,17 +10,17 @@ public class Game implements Subject {
     private Board board;
     private Color currentTurn;
     private GameStatus status;
-    private List<String> moveNotation;
+    private ArrayList<String> moveNotation;
     private static String DEFAULT_SAVE_FILE = "chess_save.dat";
-    private List<Observer> observers;
+    private ArrayList<Observer> observers;
     private static Game gameInstance;
 
     private Game() {
-        this.board = Board.getBoardInstance();
+        this.board = new Board();
         this.currentTurn = Color.WHITE;
         this.status = GameStatus.ACTIVE;
-        this.moveNotation = new ArrayList<>();
-        this.observers = new ArrayList<>();
+        this.moveNotation = new ArrayList<String>();
+        this.observers = new ArrayList<Observer>();
     }
 
     public static Game getGameInstance() {
@@ -32,27 +31,27 @@ public class Game implements Subject {
     }
 
     public boolean makeMove(Position from, Position to) {
-        Piece piece = board.getPiece(from);
+        Piece piece = this.board.getPiece(from);
         if (piece == null || piece.getColor() != currentTurn) {
             return false;
         }
 
-        if (!piece.isValidMove(to, board)) {
+        if (!piece.isValidMove(to)) {
             return false;
         }
 
         // Make the move temporarily
-        board.movePiece(from, to);
+        this.board.movePiece(from, to);
         
         // Check if the move puts or leaves own king in check
-        Position kingPos = board.findKing(currentTurn);
-        if (board.isUnderAttack(kingPos, getOppositeColor(currentTurn))) {
-            board.undoLastMove();
+        Position kingPos = this.board.findKing(currentTurn);
+        if (this.board.isUnderAttack(kingPos, getOppositeColor(currentTurn))) {
+            this.board.undoLastMove();
             return false;
         }
 
         // Record the move in notation
-        recordMove(board.getMoveHistory().get(board.getMoveHistory().size() - 1));
+        recordMove(this.board.getMoveHistory().get(this.board.getMoveHistory().size() - 1));
         
         // Switch turns and update game status
         switchTurn();
@@ -67,53 +66,54 @@ public class Game implements Subject {
     }
 
     private void switchTurn() {
-        currentTurn = getOppositeColor(currentTurn);
+        currentTurn = this.getOppositeColor(currentTurn);
     }
 
     private void updateGameStatus() {
-        Color oppositeColor = getOppositeColor(currentTurn);
-        Position kingPos = board.findKing(currentTurn);
+        Color oppositeColor = this.getOppositeColor(currentTurn);
+        Position kingPos = this.board.findKing(currentTurn);
         
-        if (board.isUnderAttack(kingPos, oppositeColor)) {
-            status = GameStatus.CHECK;
+        if (this.board.isUnderAttack(kingPos, oppositeColor)) {
+            this.status = GameStatus.CHECK;
             
             if (isCheckmate()) {
-                status = GameStatus.CHECKMATE;
+                this.status = GameStatus.CHECKMATE;
             }
         } else if (isStalemate()) {
-            status = GameStatus.STALEMATE;
+            this.status = GameStatus.STALEMATE;
         } else {
-            status = GameStatus.ACTIVE;
+            this.status = GameStatus.ACTIVE;
         }
     }
 
     private boolean isCheckmate() {
-        return !hasLegalMoves() && status == GameStatus.CHECK;
+        return !hasLegalMoves() && this.status == GameStatus.CHECK;
     }
 
     private boolean isStalemate() {
-        return !hasLegalMoves() && status != GameStatus.CHECK;
+        return !hasLegalMoves() && this.status != GameStatus.CHECK;
     }
 
     private boolean hasLegalMoves() {
         for (int fromRow = 0; fromRow < 8; fromRow++) {
             for (int fromCol = 0; fromCol < 8; fromCol++) {
                 Position from = new Position(fromRow, fromCol);
-                Piece piece = board.getPiece(from);
+                Piece piece = this.board.getPiece(from);
                 
                 if (piece != null && piece.getColor() == currentTurn) {
                     for (int toRow = 0; toRow < 8; toRow++) {
                         for (int toCol = 0; toCol < 8; toCol++) {
                             Position to = new Position(toRow, toCol);
                             
-                            if (piece.isValidMove(to, board)) {
+                            if (piece.isValidMove(to)) {
                                 // Try move
-                                board.movePiece(from, to);
-                                Position kingPos = board.findKing(currentTurn);
-                                boolean inCheck = board.isUnderAttack(kingPos, getOppositeColor(currentTurn));
-                                board.undoLastMove();
+                                this.board.movePiece(from, to);
+                                Position kingPos = this.board.findKing(currentTurn);
+                                boolean inCheck = this.board.isUnderAttack(kingPos, getOppositeColor(currentTurn));
+                                this.board.undoLastMove();
                                 
                                 if (!inCheck) {
+                                    System.out.println("DEBUG : Legal move: " + from + " to " + to);
                                     return true;
                                 }
                             }
@@ -127,12 +127,12 @@ public class Game implements Subject {
 
     private void recordMove(Move move) {
         String notation = String.format("%d. %s", 
-            moveNotation.size() / 2 + 1, move.toString());
-        moveNotation.add(notation);
+            this.moveNotation.size() / 2 + 1, move.toString());
+        this.moveNotation.add(notation);
     }
 
     public void saveGame() throws IOException {
-        saveGame(DEFAULT_SAVE_FILE);
+        this.saveGame(DEFAULT_SAVE_FILE);
     }
 
     public void saveGame(String filename) throws IOException {
@@ -141,32 +141,31 @@ public class Game implements Subject {
         }
     }
 
-    public static Game loadGame() throws IOException, ClassNotFoundException {
-        return loadGame(DEFAULT_SAVE_FILE);
+    public Game loadGame() throws IOException, ClassNotFoundException {
+        return this.loadGame(DEFAULT_SAVE_FILE);
     }
 
-    public static Game loadGame(String filename) throws IOException, ClassNotFoundException {
+    public Game loadGame(String filename) throws IOException, ClassNotFoundException {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
             return (Game) in.readObject();
         }
     }
 
     public void undoMove() {
-        board.undoLastMove();
-        switchTurn();
-        updateGameStatus();
-        notifyObservers();
-        if (!moveNotation.isEmpty()) {
-            moveNotation.remove(moveNotation.size() - 1);
+        this.board.undoLastMove();
+        this.switchTurn();
+        this.updateGameStatus();
+        this.notifyObservers();
+        if (!this.moveNotation.isEmpty()) {
+            this.moveNotation.remove(this.moveNotation.size() - 1);
         }
     }
 
     public void promotePawn(Position position, PieceType newType) {
-        Board board = Game.getGameInstance().getBoard();
-        Piece pawn = board.getPiece(position);
+        Piece pawn = this.board.getPiece(position);
         if (pawn.getType() == PieceType.PAWN) {
             Piece promotedPiece = new Piece(newType, pawn.getColor(), position);
-            board.setPiece(position, promotedPiece);
+            this.board.setPiece(position, promotedPiece);
         }
     }
 
@@ -199,8 +198,8 @@ public class Game implements Subject {
     }
 
     // Getters
-    public Board getBoard() { return board; }
-    public Color getCurrentTurn() { return currentTurn; }
-    public GameStatus getStatus() { return status; }
-    public List<String> getMoveNotation() { return new ArrayList<>(moveNotation); }
+    public Board getBoard() { return this.board; }
+    public Color getCurrentTurn() { return this.currentTurn; }
+    public GameStatus getStatus() { return this.status; }
+    public ArrayList<String> getMoveNotation() { return this.moveNotation; }
 }

@@ -2,11 +2,10 @@ package views;
 
 import models.*;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import controllers.GameController;
-
-import java.util.List;
 
 public class GameView implements ChessView, Observer {
     private GameController gameController;
@@ -24,9 +23,9 @@ public class GameView implements ChessView, Observer {
 
     public void updateBoard() {
         //clearScreen();
-        printMoveHistory();
-        printGameInfo();
-        printBoard();
+        this.printMoveHistory();
+        this.printGameInfo();
+        this.printBoard();
     }
 
     private void clearScreen() {
@@ -88,7 +87,7 @@ public class GameView implements ChessView, Observer {
     }
 */
     private void printMoveHistory() {
-        List<String> notation = Game.getGameInstance().getMoveNotation();
+        ArrayList<String> notation = Game.getGameInstance().getMoveNotation();
         if (!notation.isEmpty()) {
             System.out.println("\nMove History:");
             for (String move : notation) {
@@ -104,7 +103,7 @@ public class GameView implements ChessView, Observer {
             Game.getGameInstance().getStatus() != GameStatus.STALEMATE) {
             
             System.out.print("\nEnter command (move: 'e2 e4', or type 'help'): ");
-            String input = scanner.nextLine().trim().toLowerCase();
+            String input = this.scanner.nextLine().trim().toLowerCase();
             
             switch (input) {
                 case "quit", "exit" -> {
@@ -133,12 +132,9 @@ public class GameView implements ChessView, Observer {
                         showError("Failed to load game: " + e.getMessage());
                     }
                 }
-                default -> gameController.handleCommand(input);
+                default -> this.gameController.handleCommand(input);
             }
         }
-
-        // Game over
-        printGameOverMessage();
     }
 
     public PieceType askPromotionPawn() {
@@ -152,7 +148,7 @@ public class GameView implements ChessView, Observer {
         while (choice < 1 || choice > 4) {
             System.out.print("Enter your choice (1-4): ");
             try {
-                choice = Integer.parseInt(scanner.nextLine().trim());
+                choice = Integer.parseInt(this.scanner.nextLine().trim());
             } catch (NumberFormatException e) {
                 showError("Invalid input! Please enter a number between 1 and 4.");
             }
@@ -166,7 +162,7 @@ public class GameView implements ChessView, Observer {
             default -> throw new IllegalStateException("Unexpected value: " + choice);
         };
     }
-
+/* 
     private void printGameOverMessage() {
         System.out.println("\nGame Over!");
         if (Game.getGameInstance().getStatus() == GameStatus.CHECKMATE) {
@@ -176,7 +172,7 @@ public class GameView implements ChessView, Observer {
             System.out.println("Stalemate! The game is a draw.");
         }
     }
-
+*/
     @Override
     public void update() {
         updateBoard();

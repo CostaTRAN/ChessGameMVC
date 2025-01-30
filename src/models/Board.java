@@ -1,31 +1,22 @@
 package models;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Board {
     private Piece[][] squares;
-    private List<Move> moveHistory;
-    private static Board boardInstance;
+    private ArrayList<Move> moveHistory;
 
-    private Board() {
-        squares = new Piece[8][8];
-        moveHistory = new ArrayList<>();
+    public Board() {
+        this.squares = new Piece[8][8];
+        this.moveHistory = new ArrayList<Move>();
         initializeBoard();
-    }
-
-    public static Board getBoardInstance() {
-        if (Board.boardInstance == null) {
-            Board.boardInstance = new Board();
-        }
-        return Board.boardInstance;
     }
 
     public void initializeBoard() {
         // Place pawns
         for (int col = 0; col < 8; col++) {
-            squares[1][col] = new Piece(PieceType.PAWN, Color.WHITE, new Position(1, col));
-            squares[6][col] = new Piece(PieceType.PAWN, Color.BLACK, new Position(6, col));
+            this.squares[1][col] = new Piece(PieceType.PAWN, Color.WHITE, new Position(1, col));
+            this.squares[6][col] = new Piece(PieceType.PAWN, Color.BLACK, new Position(6, col));
         }
 
         // Place major pieces
@@ -51,38 +42,38 @@ public class Board {
 
         for (int row = 2; row < 6; row++) {
             for (int col = 0; col < 8; col++) {
-                squares[row][col] = null;
+                this.squares[row][col] = null;
             }
         }
     }
 
     private void placePiece(int row, int col, PieceType type, Color color) {
         Position pos = new Position(row, col);
-        squares[row][col] = new Piece(type, color, pos);
+        this.squares[row][col] = new Piece(type, color, pos);
     }
 
     public Piece getPiece(Position position) {
-        return squares[position.getRow()][position.getColumn()];
+        return this.squares[position.getRow()][position.getColumn()];
     }
 
     public void setPiece(Position position, Piece piece) {
-        squares[position.getRow()][position.getColumn()] = piece;
+        this.squares[position.getRow()][position.getColumn()] = piece;
     }
 
     public void movePiece(Position from, Position to) {
         Piece piece = getPiece(from);
         Piece capturedPiece = getPiece(to);
         
-        moveHistory.add(new Move(piece, from, to, capturedPiece));
+        this.moveHistory.add(new Move(piece, from, to, capturedPiece));
         
-        squares[to.getRow()][to.getColumn()] = piece;
-        squares[from.getRow()][from.getColumn()] = null;
+        this.squares[to.getRow()][to.getColumn()] = piece;
+        this.squares[from.getRow()][from.getColumn()] = null;
         piece.setPosition(to);
         piece.setMoved();
 
         // Handle castling
         if (piece.getType() == PieceType.KING && Math.abs(to.getColumn() - from.getColumn()) == 2) {
-            handleCastling(from, to);
+            this.handleCastling(from, to);
         }
     }
 
@@ -93,8 +84,8 @@ public class Board {
             Position rookFrom = new Position(row, 7);
             Position rookTo = new Position(row, 5);
             Piece rook = getPiece(rookFrom);
-            squares[rookTo.getRow()][rookTo.getColumn()] = rook;
-            squares[rookFrom.getRow()][rookFrom.getColumn()] = null;
+            this.squares[rookTo.getRow()][rookTo.getColumn()] = rook;
+            this.squares[rookFrom.getRow()][rookFrom.getColumn()] = null;
             rook.setPosition(rookTo);
             rook.setMoved();
         }
@@ -103,21 +94,21 @@ public class Board {
             Position rookFrom = new Position(row, 0);
             Position rookTo = new Position(row, 3);
             Piece rook = getPiece(rookFrom);
-            squares[rookTo.getRow()][rookTo.getColumn()] = rook;
-            squares[rookFrom.getRow()][rookFrom.getColumn()] = null;
+            this.squares[rookTo.getRow()][rookTo.getColumn()] = rook;
+            this.squares[rookFrom.getRow()][rookFrom.getColumn()] = null;
             rook.setPosition(rookTo);
             rook.setMoved();
         }
     }
 
     public void undoLastMove() {
-        if (moveHistory.isEmpty()) return;
+        if (this.moveHistory.isEmpty()) return;
         
-        Move lastMove = moveHistory.remove(moveHistory.size() - 1);
+        Move lastMove = this.moveHistory.remove(moveHistory.size() - 1);
         
         // Restore pieces to their original positions
-        squares[lastMove.getFrom().getRow()][lastMove.getFrom().getColumn()] = lastMove.getPiece();
-        squares[lastMove.getTo().getRow()][lastMove.getTo().getColumn()] = lastMove.getCapturedPiece();
+        this.squares[lastMove.getFrom().getRow()][lastMove.getFrom().getColumn()] = lastMove.getPiece();
+        this.squares[lastMove.getTo().getRow()][lastMove.getTo().getColumn()] = lastMove.getCapturedPiece();
         
         // Update piece position
         lastMove.getPiece().setPosition(lastMove.getFrom());
@@ -125,7 +116,7 @@ public class Board {
         // Handle castling undo
         if (lastMove.getPiece().getType() == PieceType.KING && 
             Math.abs(lastMove.getTo().getColumn() - lastMove.getFrom().getColumn()) == 2) {
-            undoCastling(lastMove.getFrom(), lastMove.getTo());
+                this.undoCastling(lastMove.getFrom(), lastMove.getTo());
         }
         
         // Reset moved status if it was the piece's first move
@@ -141,8 +132,8 @@ public class Board {
             Position rookFrom = new Position(row, 7);
             Position rookTo = new Position(row, 5);
             Piece rook = getPiece(rookTo);
-            squares[rookFrom.getRow()][rookFrom.getColumn()] = rook;
-            squares[rookTo.getRow()][rookTo.getColumn()] = null;
+            this.squares[rookFrom.getRow()][rookFrom.getColumn()] = rook;
+            this.squares[rookTo.getRow()][rookTo.getColumn()] = null;
             rook.setPosition(rookFrom);
             rook.setMoved(false);
         }
@@ -151,8 +142,8 @@ public class Board {
             Position rookFrom = new Position(row, 0);
             Position rookTo = new Position(row, 3);
             Piece rook = getPiece(rookTo);
-            squares[rookFrom.getRow()][rookFrom.getColumn()] = rook;
-            squares[rookTo.getRow()][rookTo.getColumn()] = null;
+            this.squares[rookFrom.getRow()][rookFrom.getColumn()] = rook;
+            this.squares[rookTo.getRow()][rookTo.getColumn()] = null;
             rook.setPosition(rookFrom);
             rook.setMoved(false);
         }
@@ -161,7 +152,7 @@ public class Board {
     public Position findKing(Color color) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                Piece piece = squares[row][col];
+                Piece piece = this.squares[row][col];
                 if (piece != null && piece.getType() == PieceType.KING && piece.getColor() == color) {
                     return new Position(row, col);
                 }
@@ -173,9 +164,9 @@ public class Board {
     public boolean isUnderAttack(Position position, Color attackingColor) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                Piece piece = squares[row][col];
+                Piece piece = this.squares[row][col];
                 if (piece != null && piece.getColor() == attackingColor) {
-                    if (piece.isValidMove(position, this)) {
+                    if (piece.isValidMove(position)) {
                         return true;
                     }
                 }
@@ -184,8 +175,8 @@ public class Board {
         return false;
     }
 
-    public List<Move> getMoveHistory() {
-        return new ArrayList<>(moveHistory);
+    public ArrayList<Move> getMoveHistory() {
+        return this.moveHistory;
     }
 
     public boolean isValidPosition(Position position) {

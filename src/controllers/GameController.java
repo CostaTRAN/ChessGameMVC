@@ -28,9 +28,9 @@ public class GameController {
         if (command.equals("save")) {
             try {
                 Game.getGameInstance().saveGame("chess_save.dat");
-                view.showMessage("Game saved successfully!");
+                this.view.showMessage("Game saved successfully!");
             } catch (IOException e) {
-                view.showError("Error saving game: " + e.getMessage());
+                this.view.showError("Error saving game: " + e.getMessage());
             }
             return;
         }
@@ -39,10 +39,10 @@ public class GameController {
             try {
                 Game.getGameInstance().loadGame("chess_save.dat");
                 // Update game reference and refresh view
-                view.update();
-                view.showMessage("Game loaded successfully!");
+                this.view.update();
+                this.view.showMessage("Game loaded successfully!");
             } catch (IOException | ClassNotFoundException e) {
-                view.showError("Error loading game: " + e.getMessage());
+                this.view.showError("Error loading game: " + e.getMessage());
             }
             return;
         }
@@ -53,7 +53,7 @@ public class GameController {
     public void handleMove(String moveCommand) {
         String[] parts = moveCommand.split(" ");
         if (parts.length != 2) {
-            view.showError("Invalid command format! Use 'e2 e4' format.");
+            this.view.showError("Invalid command format! Use 'e2 e4' format.");
             return;
         }
 
@@ -62,22 +62,22 @@ public class GameController {
             Position to = parsePosition(parts[1]);
 
             if (!from.isValid() || !to.isValid()) {
-                view.showError("Invalid position!");
+                this.view.showError("Invalid position!");
                 return;
             }
 
             if (Game.getGameInstance().makeMove(from, to)) {
                 Piece piece = Game.getGameInstance().getBoard().getPiece(to);
                 if (piece.getType() == PieceType.PAWN && (to.getRow() == 0 || to.getRow() == 7)) {
-                    PieceType promotionType = ((GameView) view).askPromotionPawn();
+                    PieceType promotionType = ((GameView) this.view).askPromotionPawn();
                     Game.getGameInstance().promotePawn(to, promotionType);
                 }
                 updateGameStatus();
             } else {
-                view.showError("Invalid move!");
+                this.view.showError("Invalid move!");
             }
         } catch (IllegalArgumentException e) {
-            view.showError("Invalid position format! Use 'e2 e4' format.");
+            this.view.showError("Invalid position format! Use 'e2 e4' format.");
         }
     }
 
@@ -92,10 +92,10 @@ public class GameController {
 
     private void updateGameStatus() {
         switch (Game.getGameInstance().getStatus()) {
-            case CHECK -> view.showMessage("Check!");
-            case CHECKMATE -> view.showMessage("Checkmate! " + 
+            case CHECK -> this.view.showMessage("Check!");
+            case CHECKMATE -> this.view.showMessage("\nGame Over!\nCheckmate! " + 
                 (Game.getGameInstance().getCurrentTurn() == Color.WHITE ? "Black" : "White") + " wins!");
-            case STALEMATE -> view.showMessage("Stalemate! Game is drawn.");
+            case STALEMATE -> this.view.showMessage("Stalemate! Game is drawn.");
             case ACTIVE -> {} // No message needed
         }
     }
