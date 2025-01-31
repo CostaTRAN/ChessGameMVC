@@ -10,11 +10,11 @@ import controllers.GameController;
 public class GameView implements ChessView, Observer {
     private GameController gameController;
     private Scanner scanner;
-    private static String ANSI_RESET = "\u001B[0m";
-    private static String ANSI_WHITE = "\u001B[37m";
-    private static String ANSI_BLACK = "\u001B[30m";
-    private static String ANSI_WHITE_BACKGROUND = "\u001B[47m";
-    private static String ANSI_GRAY_BACKGROUND = "\u001B[100m";
+    private String ANSI_RESET = "\u001B[0m";
+    private String ANSI_WHITE = "\u001B[37m";
+    private String ANSI_BLACK = "\u001B[30m";
+    private String ANSI_WHITE_BACKGROUND = "\u001B[47m";
+    private String ANSI_GRAY_BACKGROUND = "\u001B[100m";
 
     public GameView() {
         this.gameController = new GameController(this);
