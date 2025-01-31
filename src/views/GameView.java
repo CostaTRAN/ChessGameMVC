@@ -1,12 +1,14 @@
 package views;
 
 import models.*;
-
 import java.util.ArrayList;
 import java.util.Scanner;
-
 import controllers.GameController;
 
+/**
+ * La classe GameView représente la vue principale du jeu d'échecs.
+ * Elle implémente les interfaces ChessView et Observer pour gérer l'affichage et les mises à jour de la vue.
+ */
 public class GameView implements ChessView, Observer {
     private GameController gameController;
     private Scanner scanner;
@@ -16,17 +18,27 @@ public class GameView implements ChessView, Observer {
     private String ANSI_WHITE_BACKGROUND = "\u001B[47m";
     private String ANSI_GRAY_BACKGROUND = "\u001B[100m";
 
+    /**
+     * Constructeur de la classe GameView.
+     * Initialise le contrôleur de jeu et le scanner pour les entrées utilisateur.
+     */
     public GameView() {
         this.gameController = new GameController(this);
         this.scanner = new Scanner(System.in);
     }
 
+    /**
+     * Met à jour l'affichage de l'échiquier.
+     */
     public void updateBoard() {
         this.printMoveHistory();
         this.printGameInfo();
         this.printBoard();
     }
 
+    /**
+     * Affiche les informations du jeu, telles que le tour actuel et le statut du jeu.
+     */
     private void printGameInfo() {
         System.out.println("\nChess Game");
         System.out.println("==========");
@@ -37,38 +49,44 @@ public class GameView implements ChessView, Observer {
         System.out.println();
     }
 
+    /**
+     * Affiche l'échiquier avec les pièces et les couleurs de fond alternées.
+     */
     private void printBoard() {
         Board board = Game.getGameInstance().getBoard();
         System.out.println("    a  b  c  d  e  f  g  h");
         System.out.println("  --------------------------");
-        
+
         for (int row = 7; row >= 0; row--) {
             System.out.print((row + 1) + " |");
-            
+
             for (int col = 0; col < 8; col++) {
                 Position pos = new Position(row, col);
                 Piece piece = board.getPiece(pos);
-                
-                // Alternate background colors for checker pattern
-                String background = (row + col) % 2 == 0 ? 
+
+                // Alternance des couleurs de fond pour un motif en damier
+                String background = (row + col) % 2 == 0 ?
                     ANSI_WHITE_BACKGROUND : ANSI_GRAY_BACKGROUND;
-                
+
                 if (piece == null) {
                     System.out.print(background + "   " + ANSI_RESET);
                 } else {
-                    String pieceColor = piece.getColor() == Color.WHITE ? 
+                    String pieceColor = piece.getColor() == Color.WHITE ?
                         ANSI_WHITE : ANSI_BLACK;
-                    System.out.print(background + pieceColor + 
+                    System.out.print(background + pieceColor +
                         " " + piece + ANSI_RESET);
                 }
             }
             System.out.println("| " + (row + 1));
         }
-        
+
         System.out.println("  --------------------------");
         System.out.println("    a  b  c  d  e  f  g  h");
     }
 
+    /**
+     * Affiche l'historique des mouvements.
+     */
     private void printMoveHistory() {
         ArrayList<String> notation = Game.getGameInstance().getMoveNotation();
         if (!notation.isEmpty()) {
@@ -79,9 +97,12 @@ public class GameView implements ChessView, Observer {
         }
     }
 
+    /**
+     * Démarre la boucle principale du jeu, gérant les entrées utilisateur et les commandes.
+     */
     public void startGameLoop() {
         updateBoard();
-        while (Game.getGameInstance().getStatus() != GameStatus.CHECKMATE && 
+        while (Game.getGameInstance().getStatus() != GameStatus.CHECKMATE &&
             Game.getGameInstance().getStatus() != GameStatus.STALEMATE) {
             System.out.print("\nEnter command (move: 'e2 e4', or type 'help'): ");
             String input = this.scanner.nextLine().trim().toLowerCase();
@@ -89,6 +110,11 @@ public class GameView implements ChessView, Observer {
         }
     }
 
+    /**
+     * Demande à l'utilisateur de choisir une pièce pour la promotion d'un pion.
+     *
+     * @return le type de pièce choisi pour la promotion.
+     */
     public PieceType askPromotionPawn() {
         System.out.println("Pawn promotion! Choose a piece to promote to:");
         System.out.println("1. Queen");
@@ -115,11 +141,17 @@ public class GameView implements ChessView, Observer {
         };
     }
 
+    /**
+     * Met à jour l'affichage de la vue.
+     */
     @Override
     public void update() {
         updateBoard();
     }
 
+    /**
+     * Affiche l'aide pour le joueur.
+     */
     @Override
     public void showHelp() {
         System.out.println("\nAvailable commands:");
@@ -133,11 +165,21 @@ public class GameView implements ChessView, Observer {
         System.out.println("Example: e2 e4 moves the piece from e2 to e4");
     }
 
+    /**
+     * Affiche un message à l'utilisateur.
+     *
+     * @param message le message à afficher.
+     */
     @Override
     public void showMessage(String message) {
         System.out.println("\n" + message);
     }
 
+    /**
+     * Affiche un message d'erreur à l'utilisateur.
+     *
+     * @param message le message d'erreur à afficher.
+     */
     @Override
     public void showError(String message) {
         System.err.println("\nError: " + message);

@@ -1,21 +1,35 @@
 package controllers;
 
 import views.GameView;
-
 import models.Color;
 import models.Game;
 import models.Piece;
 import models.PieceType;
 import models.Position;
 
+/**
+ * La classe GameController gère les commandes et les mouvements dans un jeu d'échecs.
+ * Elle interagit avec la vue du jeu (GameView) et le modèle du jeu (Game) pour traiter les commandes
+ * et mettre à jour l'état du jeu.
+ */
 public class GameController {
     private GameView view;
 
+    /**
+     * Constructeur de la classe GameController.
+     *
+     * @param view la vue du jeu à associer à ce contrôleur.
+     */
     public GameController(GameView view) {
         Game.getGameInstance();
         this.view = view;
     }
 
+    /**
+     * Gère une commande dans le jeu d'échecs.
+     *
+     * @param command la commande à gérer, représentée sous forme de chaîne de caractères.
+     */
     public void handleCommand(String command) {
         switch (command) {
             case "quit", "exit":
@@ -38,6 +52,11 @@ public class GameController {
         }
     }
 
+    /**
+     * Gère un mouvement dans le jeu d'échecs.
+     *
+     * @param moveCommand la commande de mouvement à gérer, représentée sous forme de chaîne de caractères.
+     */
     public void handleMove(String moveCommand) {
         String[] parts = moveCommand.split(" ");
         if (parts.length != 2) {
@@ -60,7 +79,7 @@ public class GameController {
                     PieceType promotionType = (this.view).askPromotionPawn();
                     Game.getGameInstance().promotePawn(to, promotionType);
                 }
-                updateGameStatus();
+                this.updateGameStatus();
             } else {
                 this.view.showError("Invalid move!");
             }
@@ -69,6 +88,13 @@ public class GameController {
         }
     }
 
+    /**
+     * Parse une position à partir d'une chaîne de caractères.
+     *
+     * @param pos la position à parser, représentée sous forme de chaîne de caractères.
+     * @return la position parsée.
+     * @throws IllegalArgumentException si le format de la position est invalide.
+     */
     private Position parsePosition(String pos) {
         if (pos.length() != 2) {
             throw new IllegalArgumentException("Invalid position format");
@@ -78,13 +104,23 @@ public class GameController {
         return new Position(row, column);
     }
 
+    /**
+     * Met à jour l'état du jeu et affiche les messages appropriés.
+     */
     private void updateGameStatus() {
         switch (Game.getGameInstance().getStatus()) {
-            case CHECK -> this.view.showMessage("Check!");
-            case CHECKMATE -> this.view.showMessage("\nGame Over!\nCheckmate! " + 
+            case CHECK:
+                this.view.showMessage("Check!");
+                break;
+            case CHECKMATE:
+                this.view.showMessage("\nGame Over!\nCheckmate! " +
                 (Game.getGameInstance().getCurrentTurn() == Color.WHITE ? "Black" : "White") + " wins!");
-            case STALEMATE -> this.view.showMessage("Stalemate! Game is drawn.");
-            case ACTIVE -> {} // No message needed
+                break;
+            case STALEMATE:
+                this.view.showMessage("Stalemate! Game is drawn.");
+                break;
+            case ACTIVE:
+                break;
         }
     }
 }
