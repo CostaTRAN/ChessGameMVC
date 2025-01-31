@@ -102,7 +102,8 @@ public class Board {
     }
 
     public void undoLastMove() {
-        if (this.moveHistory.isEmpty()) return;
+        if (this.moveHistory.isEmpty())
+            return;
         
         Move lastMove = this.moveHistory.remove(moveHistory.size() - 1);
         

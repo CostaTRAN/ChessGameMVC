@@ -1,9 +1,6 @@
 package controllers;
 
-import views.ChessView;
 import views.GameView;
-
-import java.io.IOException;
 
 import models.Color;
 import models.Game;
@@ -12,42 +9,33 @@ import models.PieceType;
 import models.Position;
 
 public class GameController {
-    private ChessView view;
+    private GameView view;
 
-    public GameController(ChessView view) {
+    public GameController(GameView view) {
         Game.getGameInstance();
         this.view = view;
     }
 
     public void handleCommand(String command) {
-        if (command.equals("undo")) {
-            Game.getGameInstance().undoMove();
-            return;
+        switch (command) {
+            case "quit", "exit":
+                System.out.println("Game ended by player.");
+                Game.getGameInstance().stopGame(this.view);
+                return;
+            case "help":
+                this.view.showHelp();
+                break;
+            case "undo":
+                if(Game.getGameInstance().getBoard().getMoveHistory().size() == 0) {
+                    this.view.showError("No moves to undo!");
+                    return;
+                }
+                Game.getGameInstance().undoMove();
+                break;
+            default:
+                handleMove(command);
+                break;
         }
-
-        if (command.equals("save")) {
-            try {
-                Game.getGameInstance().saveGame("chess_save.dat");
-                this.view.showMessage("Game saved successfully!");
-            } catch (IOException e) {
-                this.view.showError("Error saving game: " + e.getMessage());
-            }
-            return;
-        }
-
-        if (command.equals("load")) {
-            try {
-                Game.getGameInstance().loadGame("chess_save.dat");
-                // Update game reference and refresh view
-                this.view.update();
-                this.view.showMessage("Game loaded successfully!");
-            } catch (IOException | ClassNotFoundException e) {
-                this.view.showError("Error loading game: " + e.getMessage());
-            }
-            return;
-        }
-
-        handleMove(command);
     }
 
     public void handleMove(String moveCommand) {
@@ -69,7 +57,7 @@ public class GameController {
             if (Game.getGameInstance().makeMove(from, to)) {
                 Piece piece = Game.getGameInstance().getBoard().getPiece(to);
                 if (piece.getType() == PieceType.PAWN && (to.getRow() == 0 || to.getRow() == 7)) {
-                    PieceType promotionType = ((GameView) this.view).askPromotionPawn();
+                    PieceType promotionType = (this.view).askPromotionPawn();
                     Game.getGameInstance().promotePawn(to, promotionType);
                 }
                 updateGameStatus();

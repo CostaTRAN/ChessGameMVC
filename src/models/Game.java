@@ -1,6 +1,5 @@
 package models;
 
-import java.io.*;
 import java.util.ArrayList;
 
 import views.GameModeSelectionView;
@@ -11,7 +10,6 @@ public class Game implements Subject {
     private Color currentTurn;
     private GameStatus status;
     private ArrayList<String> moveNotation;
-    private static String DEFAULT_SAVE_FILE = "chess_save.dat";
     private ArrayList<Observer> observers;
     private static Game gameInstance;
 
@@ -113,7 +111,6 @@ public class Game implements Subject {
                                 this.board.undoLastMove();
                                 
                                 if (!inCheck) {
-                                    System.out.println("DEBUG : Legal move: " + from + " to " + to);
                                     return true;
                                 }
                             }
@@ -129,26 +126,6 @@ public class Game implements Subject {
         String notation = String.format("%d. %s", 
             this.moveNotation.size() / 2 + 1, move.toString());
         this.moveNotation.add(notation);
-    }
-
-    public void saveGame() throws IOException {
-        this.saveGame(DEFAULT_SAVE_FILE);
-    }
-
-    public void saveGame(String filename) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
-            out.writeObject(this);
-        }
-    }
-
-    public Game loadGame() throws IOException, ClassNotFoundException {
-        return this.loadGame(DEFAULT_SAVE_FILE);
-    }
-
-    public Game loadGame(String filename) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
-            return (Game) in.readObject();
-        }
     }
 
     public void undoMove() {
@@ -170,10 +147,10 @@ public class Game implements Subject {
     }
 
     public void stopGame(Observer observer) {
-        removeObserver(observer);
-        addObserver(new GameModeSelectionView());
+        this.removeObserver(observer);
+        this.addObserver(new GameModeSelectionView());
         Game.resetGameInstance();
-        notifyObservers();
+        this.notifyObservers();
     }
 
     public static void resetGameInstance() {

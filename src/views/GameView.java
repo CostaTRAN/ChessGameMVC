@@ -22,15 +22,9 @@ public class GameView implements ChessView, Observer {
     }
 
     public void updateBoard() {
-        //clearScreen();
         this.printMoveHistory();
         this.printGameInfo();
         this.printBoard();
-    }
-
-    private void clearScreen() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
     }
 
     private void printGameInfo() {
@@ -74,18 +68,7 @@ public class GameView implements ChessView, Observer {
         System.out.println("  --------------------------");
         System.out.println("    a  b  c  d  e  f  g  h");
     }
-/* 
-    private String getPieceSymbol(Piece piece) {
-        return switch (piece.getType()) {
-            case PAWN -> "P";
-            case ROOK -> "T";
-            case KNIGHT -> "C";
-            case BISHOP -> "F";
-            case QUEEN -> "D";
-            case KING -> "K";
-        };
-    }
-*/
+
     private void printMoveHistory() {
         ArrayList<String> notation = Game.getGameInstance().getMoveNotation();
         if (!notation.isEmpty()) {
@@ -98,42 +81,11 @@ public class GameView implements ChessView, Observer {
 
     public void startGameLoop() {
         updateBoard();
-
         while (Game.getGameInstance().getStatus() != GameStatus.CHECKMATE && 
             Game.getGameInstance().getStatus() != GameStatus.STALEMATE) {
-            
             System.out.print("\nEnter command (move: 'e2 e4', or type 'help'): ");
             String input = this.scanner.nextLine().trim().toLowerCase();
-            
-            switch (input) {
-                case "quit", "exit" -> {
-                    System.out.println("Game ended by player.");
-                    Game.getGameInstance().stopGame(this);
-                    return;
-                }
-                case "help" -> showHelp();
-                case "undo" -> {
-                    Game.getGameInstance().undoMove();
-                }
-                case "save" -> {
-                    try {
-                        Game.getGameInstance().saveGame();
-                        showMessage("Game saved successfully!");
-                    } catch (Exception e) {
-                        showError("Failed to save game: " + e.getMessage());
-                    }
-                }
-                case "load" -> {
-                    try {
-                        Game.getGameInstance().loadGame();
-                        showMessage("Game loaded successfully!");
-                        // Update game reference and refresh view
-                    } catch (Exception e) {
-                        showError("Failed to load game: " + e.getMessage());
-                    }
-                }
-                default -> this.gameController.handleCommand(input);
-            }
+            this.gameController.handleCommand(input);
         }
     }
 
@@ -162,17 +114,7 @@ public class GameView implements ChessView, Observer {
             default -> throw new IllegalStateException("Unexpected value: " + choice);
         };
     }
-/* 
-    private void printGameOverMessage() {
-        System.out.println("\nGame Over!");
-        if (Game.getGameInstance().getStatus() == GameStatus.CHECKMATE) {
-            Color winner = Game.getGameInstance().getCurrentTurn() == Color.WHITE ? Color.BLACK : Color.WHITE;
-            System.out.println("Checkmate! " + winner + " wins!");
-        } else if (Game.getGameInstance().getStatus() == GameStatus.STALEMATE) {
-            System.out.println("Stalemate! The game is a draw.");
-        }
-    }
-*/
+
     @Override
     public void update() {
         updateBoard();
@@ -183,9 +125,7 @@ public class GameView implements ChessView, Observer {
         System.out.println("\nAvailable commands:");
         System.out.println("- Move a piece: e2 e4 (from square to square)");
         System.out.println("- Undo last move: undo");
-        System.out.println("- Save game: save");
-        System.out.println("- Load saved game: load");
-        System.out.println("- Show this help: help");
+        System.out.println("- Show help: help");
         System.out.println("- Quit game: quit or exit");
         System.out.println("\nSquare notation:");
         System.out.println("- Files (columns): a-h");
