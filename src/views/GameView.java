@@ -42,9 +42,9 @@ public class GameView implements ChessView, Observer {
     private void printGameInfo() {
         System.out.println("\nChess Game");
         System.out.println("==========");
-        System.out.println("Current turn: " + Game.getGameInstance().getCurrentTurn());
-        if (Game.getGameInstance().getStatus() != GameStatus.ACTIVE) {
-            System.out.println("Game Status: " + Game.getGameInstance().getStatus());
+        System.out.println("Current turn: " + Game.getCurrentTurn());
+        if (Game.getStatus() != GameStatus.ACTIVE) {
+            System.out.println("Game Status: " + Game.getStatus());
         }
         System.out.println();
     }
@@ -102,11 +102,18 @@ public class GameView implements ChessView, Observer {
      */
     public void startGameLoop() {
         updateBoard();
-        while (Game.getGameInstance().getStatus() != GameStatus.CHECKMATE &&
-            Game.getGameInstance().getStatus() != GameStatus.STALEMATE) {
-            System.out.print("\nEnter command (move: 'e2 e4', or type 'help'): ");
-            String input = this.scanner.nextLine().trim().toLowerCase();
-            this.gameController.handleCommand(input);
+        while (Game.getStatus() == GameStatus.ACTIVE ||
+                Game.getStatus() == GameStatus.CHECK) {
+
+            if ((Game.getPlayerColor() != Game.getCurrentTurn()) && Game.getAiEnabled()) {
+                System.out.print("\nTour de l'IA");
+                this.gameController.playRandomMove();
+            }
+            else {
+                System.out.print("\nEnter command (move: 'e2 e4', or type 'help'): ");
+                String input = this.scanner.nextLine().trim().toLowerCase();
+                this.gameController.handleCommand(input);
+            }
         }
     }
 

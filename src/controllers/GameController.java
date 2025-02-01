@@ -1,8 +1,15 @@
 package controllers;
 
 import views.GameView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import models.Board;
 import models.Color;
 import models.Game;
+import models.Move;
 import models.Piece;
 import models.PieceType;
 import models.Position;
@@ -109,19 +116,82 @@ public class GameController implements ChessController {
      * Met à jour l'état du jeu et affiche les messages appropriés.
      */
     private void updateGameStatus() {
-        switch (Game.getGameInstance().getStatus()) {
+        switch (Game.getStatus()) {
             case CHECK:
                 this.view.showMessage("Check!");
                 break;
             case CHECKMATE:
                 this.view.showMessage("\nGame Over!\nCheckmate! " +
-                (Game.getGameInstance().getCurrentTurn() == Color.WHITE ? "Black" : "White") + " wins!");
+                (Game.getCurrentTurn() == Color.WHITE ? "Black" : "White") + " wins!");
                 break;
             case STALEMATE:
                 this.view.showMessage("Stalemate! Game is drawn.");
                 break;
             case ACTIVE:
                 break;
+            default:
+                break;
         }
+    }
+
+    /**
+     * Joue un coup alétoire pour l'IA.
+     */
+    public void playRandomMove() {
+        Game game = Game.getGameInstance();
+        Board board = game.getBoard();
+        List<Move> legalMoves = new ArrayList<>();
+        Color aiColor = (Game.getPlayerColor() == Color.WHITE) ? Color.BLACK : Color.WHITE;
+
+        for (int fromRow = 0; fromRow < 8; fromRow++) {
+            for (int fromCol = 0; fromCol < 8; fromCol++) {
+                Position from = new Position(fromRow, fromCol);
+                Piece piece = board.getPiece(from);
+                if (piece != null && piece.getColor() == aiColor) {
+                    for (int toRow = 0; toRow < 8; toRow++) {
+                        for (int toCol = 0; toCol < 8; toCol++) {
+                            Position to = new Position(toRow, toCol);
+                            if (piece.isValidMove(to)) {
+                                board.movePiece(from, to);
+                                Position kingPos = board.findKing(aiColor);
+                                boolean inCheck = board.isUnderAttack(kingPos, getOppositeColor(aiColor));
+                                board.undoLastMove();
+
+                                if (!inCheck) {
+                                    legalMoves.add(new Move(piece, from, to, board.getPiece(to)));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (legalMoves.isEmpty()) {
+           this.view.showError("L'IA n'a aucun coup légal à jouer !");
+            return;
+        }
+
+        var random = new Random();
+        Move selectedMove = legalMoves.get(random.nextInt(legalMoves.size()));
+        
+        boolean moveSuccess = game.makeMove(selectedMove.getFrom(), selectedMove.getTo());
+        if (moveSuccess) {
+            this.view.showMessage("L'IA (" + aiColor + ") a déplacé " +
+                selectedMove.getPiece() + " de " + selectedMove.getFrom() + " vers " + selectedMove.getTo());
+                
+            Piece movedPiece = board.getPiece(selectedMove.getTo());
+            if (movedPiece.getType() == PieceType.PAWN && (selectedMove.getTo().getRow() == 0 || selectedMove.getTo().getRow() == 7)) {
+                game.promotePawn(selectedMove.getTo(), PieceType.QUEEN);
+            }
+
+            updateGameStatus();
+        } else {
+            this.view.showError("L'IA n'a pas pu jouer le coup sélectionné.");
+        }
+    }
+
+    private Color getOppositeColor(Color color) {
+        return (color == Color.WHITE) ? Color.BLACK : Color.WHITE;
     }
 }

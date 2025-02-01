@@ -9,6 +9,8 @@ public enum GameStatus {
      */
     ACTIVE,
 
+    INACTIVE,
+
     /**
      * Un roi est en échec.
      */

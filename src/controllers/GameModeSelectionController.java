@@ -1,8 +1,10 @@
 package controllers;
 
+import models.Color;
 import models.Game;
 import views.GameModeSelectionView;
 import views.GameView;
+import java.util.Random;
 
 /**
  * La classe GameModeSelectionController gère la sélection du mode de jeu pour une partie d'échecs.
@@ -20,6 +22,23 @@ public class GameModeSelectionController implements ChessController {
      */
     public GameModeSelectionController(GameModeSelectionView view) {
         this.view = view;
+    }
+
+    private void setPlayerColor(String input){
+        switch (input) {
+            case "w":
+                Game.setPlayerColor(Color.WHITE);
+                break;
+            case "b":
+                Game.setPlayerColor(Color.BLACK);
+                break;
+            case "r":
+                Random random = new Random();
+                Game.setPlayerColor((random.nextInt(5) == 0) ? Color.WHITE : Color.BLACK);
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -42,13 +61,21 @@ public class GameModeSelectionController implements ChessController {
                     asking = false;
                     break;
                 case "pva":
-                    System.out.println("Starting Player vs AI game...");
+                    this.view.showMessage("Starting Player vs AI game...");
+                    GameView gameViewAI = new GameView();
+                    Game.getGameInstance().setAiEnabled(true);
+                    Game.getGameInstance().removeObserver(this.view);
+                    Game.getGameInstance().addObserver(gameViewAI);
+                    Game.getGameInstance().getBoard().initializeBoard();
+                    setPlayerColor(this.view.showColorChoice());
+                    gameViewAI.startGameLoop();
+                    Game.getGameInstance().setAiEnabled(false);
                     asking = false;
                     break;
                 case "exit":
                     System.out.println("Exiting game...");
                     asking = false;
-                    break;
+                    return;
                 case "help":
                     this.view.showHelp();
                     break;
