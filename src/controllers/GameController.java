@@ -191,6 +191,12 @@ public class GameController implements ChessController {
         }
     }
 
+    /**
+     * Retourne la couleur opposée à la couleur donnée.
+     *
+     * @param color la couleur donnée.
+     * @return la couleur opposée à la couleur donnée.
+     */
     private Color getOppositeColor(Color color) {
         return (color == Color.WHITE) ? Color.BLACK : Color.WHITE;
     }

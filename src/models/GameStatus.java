@@ -9,6 +9,9 @@ public enum GameStatus {
      */
     ACTIVE,
 
+    /**
+     * La partie est inactive.
+     */
     INACTIVE,
 
     /**

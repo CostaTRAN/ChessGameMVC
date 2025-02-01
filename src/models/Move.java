@@ -7,9 +7,9 @@ package models;
  */
 public class Move {
     private Piece piece;
+    private Piece capturedPiece;
     private Position from;
     private Position to;
-    private Piece capturedPiece;
     private boolean isFirstMove;
 
     /**
@@ -36,6 +36,14 @@ public class Move {
     public Piece getPiece() { return this.piece; }
 
     /**
+     * Retourne la pièce capturée (si applicable).
+     *
+     * @return la pièce capturée, ou null si aucune pièce n'a été capturée.
+     */
+    public Piece getCapturedPiece() { return this.capturedPiece; }
+
+
+    /**
      * Retourne la position de départ.
      *
      * @return la position de départ.
@@ -48,13 +56,6 @@ public class Move {
      * @return la position d'arrivée.
      */
     public Position getTo() { return this.to; }
-
-    /**
-     * Retourne la pièce capturée (si applicable).
-     *
-     * @return la pièce capturée, ou null si aucune pièce n'a été capturée.
-     */
-    public Piece getCapturedPiece() { return this.capturedPiece; }
 
     /**
      * Indique si c'est le premier mouvement de la pièce.

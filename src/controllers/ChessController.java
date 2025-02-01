@@ -12,5 +12,5 @@ public interface ChessController {
      *
      * @param command la commande à gérer, représentée sous forme de chaîne de caractères.
      */
-    void handleCommand(String command);
+    public void handleCommand(String command);
 }

@@ -14,7 +14,7 @@ public class GameModeSelectionView implements ChessView, Observer {
 
     /**
      * Constructeur de la classe GameModeSelectionView.
-     * Initialise le contrôleur de sélection du mode de jeu.
+     * Initialise le contrôleur de sélection du mode de jeu et le scanner pour les entrées utilisateur.
      */
     public GameModeSelectionView() {
         this.gameModeSelectionController = new GameModeSelectionController(this);
@@ -34,6 +34,11 @@ public class GameModeSelectionView implements ChessView, Observer {
         this.gameModeSelectionController.handleCommand(command);
     }
 
+    /**
+     * Affiche les options de choix de couleur pour le joueur.
+     *
+     * @return la commande de choix de couleur entrée par l'utilisateur.
+     */
     public String showColorChoice() {
         System.out.println("Choose a Color");
         System.out.println("w : White");

@@ -9,5 +9,5 @@ public interface Observer {
     /**
      * Met à jour l'état de l'observateur.
      */
-    void update();
+    public void update();
 }
