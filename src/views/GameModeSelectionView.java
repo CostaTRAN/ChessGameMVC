@@ -1,5 +1,6 @@
 package views;
 
+import java.util.Scanner;
 import controllers.GameModeSelectionController;
 
 /**
@@ -9,6 +10,7 @@ import controllers.GameModeSelectionController;
 public class GameModeSelectionView implements ChessView, Observer {
 
     private GameModeSelectionController gameModeSelectionController;
+    private Scanner scanner;
 
     /**
      * Constructeur de la classe GameModeSelectionView.
@@ -16,6 +18,7 @@ public class GameModeSelectionView implements ChessView, Observer {
      */
     public GameModeSelectionView() {
         this.gameModeSelectionController = new GameModeSelectionController(this);
+        this.scanner = new Scanner(System.in);
     }
 
     /**
@@ -27,7 +30,8 @@ public class GameModeSelectionView implements ChessView, Observer {
         System.out.println("pvp : Player vs Player");
         System.out.println("pva : Player vs AI");
         System.out.println("exit : Exit");
-        this.gameModeSelectionController.handleCommand();
+        String command = this.scanner.nextLine().trim().toLowerCase();
+        this.gameModeSelectionController.handleCommand(command);
     }
 
     /**
@@ -47,7 +51,7 @@ public class GameModeSelectionView implements ChessView, Observer {
         System.out.println("- Start Player vs Player game : pvp");
         System.out.println("- Start Player vs AI game : pva");
         System.out.println("- Show help : help");
-        System.out.println("- Exit game : exit");
+        System.out.println("- Quit game : quit or exit");
     }
 
     /**

@@ -1,6 +1,5 @@
 package controllers;
 
-import java.util.Scanner;
 import models.Game;
 import views.GameModeSelectionView;
 import views.GameView;
@@ -10,10 +9,9 @@ import views.GameView;
  * Elle interagit avec la vue de sélection du mode de jeu (GameModeSelectionView) et le modèle du jeu (Game)
  * pour traiter les commandes de sélection du mode de jeu.
  */
-public class GameModeSelectionController {
+public class GameModeSelectionController implements ChessController {
 
     private GameModeSelectionView view;
-    private Scanner scanner;
 
     /**
      * Constructeur de la classe GameModeSelectionController.
@@ -22,7 +20,6 @@ public class GameModeSelectionController {
      */
     public GameModeSelectionController(GameModeSelectionView view) {
         this.view = view;
-        this.scanner = new Scanner(System.in);
     }
 
     /**
@@ -30,10 +27,10 @@ public class GameModeSelectionController {
      * Cette méthode entre dans une boucle pour demander à l'utilisateur de choisir un mode de jeu
      * jusqu'à ce qu'une commande valide soit entrée.
      */
-    public void handleCommand() {
+    @Override
+    public void handleCommand(String command) {
         boolean asking = true;
         while (asking) {
-            String command = this.scanner.nextLine().trim().toLowerCase();
             switch (command) {
                 case "pvp":
                     this.view.showMessage("Starting Player vs Player game...");

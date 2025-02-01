@@ -12,7 +12,7 @@ import models.Position;
  * Elle interagit avec la vue du jeu (GameView) et le modèle du jeu (Game) pour traiter les commandes
  * et mettre à jour l'état du jeu.
  */
-public class GameController {
+public class GameController implements ChessController {
     private GameView view;
 
     /**
@@ -30,6 +30,7 @@ public class GameController {
      *
      * @param command la commande à gérer, représentée sous forme de chaîne de caractères.
      */
+    @Override
     public void handleCommand(String command) {
         switch (command) {
             case "quit", "exit":
