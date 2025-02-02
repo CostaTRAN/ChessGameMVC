@@ -42,6 +42,8 @@ public class GameModeSelectionController implements ChessController {
                 Game.setPlayerColor((random.nextInt(5) == 0) ? Color.WHITE : Color.BLACK);
                 break;
             default:
+                System.out.println("Invalid command! Please enter 'w', 'b' or 'r'.");
+                this.setPlayerColor(this.view.showColorChoice());
                 break;
         }
     }
@@ -55,41 +57,36 @@ public class GameModeSelectionController implements ChessController {
      */
     @Override
     public void handleCommand(String command) {
-        boolean asking = true;
-        while (asking) {
-            switch (command) {
-                case "pvp":
-                    this.view.showMessage("Starting Player vs Player game...");
-                    GameView gameView = new GameView();
-                    Game.getGameInstance().removeObserver(this.view);
-                    Game.getGameInstance().addObserver(gameView);
-                    Game.getGameInstance().getBoard().initializeBoard();
-                    gameView.startGameLoop();
-                    asking = false;
-                    break;
-                case "pva":
-                    this.view.showMessage("Starting Player vs AI game...");
-                    GameView gameViewAI = new GameView();
-                    Game.getGameInstance().setAiEnabled(true);
-                    Game.getGameInstance().removeObserver(this.view);
-                    Game.getGameInstance().addObserver(gameViewAI);
-                    Game.getGameInstance().getBoard().initializeBoard();
-                    setPlayerColor(this.view.showColorChoice());
-                    gameViewAI.startGameLoop();
-                    Game.getGameInstance().setAiEnabled(false);
-                    asking = false;
-                    break;
-                case "exit":
-                    System.out.println("Exiting game...");
-                    asking = false;
-                    return;
-                case "help":
-                    this.view.showHelp();
-                    break;
-                default:
-                    System.out.println("Invalid command! Please enter 'pvp', 'pva', 'help' or 'exit'.");
-                    break;
-            }
+        switch (command) {
+            case "pvp":
+                this.view.showMessage("Starting Player vs Player game...");
+                GameView gameView = new GameView();
+                Game.getGameInstance().removeObserver(this.view);
+                Game.getGameInstance().addObserver(gameView);
+                Game.getGameInstance().getBoard().initializeBoard();
+                gameView.startGameLoop();
+                break;
+            case "pva":
+                this.view.showMessage("Starting Player vs AI game...");
+                GameView gameViewAI = new GameView();
+                Game.getGameInstance().setAiEnabled(true);
+                Game.getGameInstance().removeObserver(this.view);
+                Game.getGameInstance().addObserver(gameViewAI);
+                Game.getGameInstance().getBoard().initializeBoard();
+                this.setPlayerColor(this.view.showColorChoice());
+                gameViewAI.startGameLoop();
+                Game.getGameInstance().setAiEnabled(false);
+                break;
+            case "exit":
+                System.out.println("Exiting game...");
+                return;
+            case "help":
+                this.view.showHelp();
+                break;
+            default:
+                System.out.println("Invalid command! Please enter 'pvp', 'pva', 'help' or 'exit'.");
+                this.view.showGameModeSelection();
+                break;
         }
     }
 }

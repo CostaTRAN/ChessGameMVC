@@ -43,7 +43,7 @@ public class GameModeSelectionView implements ChessView, Observer {
         System.out.println("Choose a Color");
         System.out.println("w : White");
         System.out.println("b : Black");
-        System.out.println("r : random");
+        System.out.println("r : Random");
         String command = this.scanner.nextLine().trim().toLowerCase();
         return command;
     }
