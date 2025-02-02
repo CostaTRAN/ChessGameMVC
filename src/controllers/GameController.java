@@ -3,7 +3,6 @@ package controllers;
 import views.GameView;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import models.Board;
@@ -135,28 +134,41 @@ public class GameController implements ChessController {
     }
 
     /**
-     * Joue un coup alétoire pour l'IA.
+     * Joue un coup aléatoire pour l'IA.
      */
     public void playRandomMove() {
+        // Obtient l'instance unique du jeu
         Game game = Game.getGameInstance();
+        // Obtient l'échiquier du jeu
         Board board = game.getBoard();
-        List<Move> legalMoves = new ArrayList<>();
+        // Liste pour stocker les coups légaux
+        ArrayList<Move> legalMoves = new ArrayList<Move>();
+        // Détermine la couleur de l'IA en fonction de la couleur du joueur
         Color aiColor = (Game.getPlayerColor() == Color.WHITE) ? Color.BLACK : Color.WHITE;
 
+        // Parcourt toutes les positions de l'échiquier pour trouver les pièces de l'IA
         for (int fromRow = 0; fromRow < 8; fromRow++) {
             for (int fromCol = 0; fromCol < 8; fromCol++) {
                 Position from = new Position(fromRow, fromCol);
                 Piece piece = board.getPiece(from);
+                // Vérifie si la pièce appartient à l'IA
                 if (piece != null && piece.getColor() == aiColor) {
+                    // Parcourt toutes les positions possibles pour déplacer la pièce
                     for (int toRow = 0; toRow < 8; toRow++) {
                         for (int toCol = 0; toCol < 8; toCol++) {
                             Position to = new Position(toRow, toCol);
+                            // Vérifie si le mouvement est valide
                             if (piece.isValidMove(to)) {
+                                // Effectue le mouvement temporairement
                                 board.movePiece(from, to);
+                                // Trouve la position du roi de l'IA
                                 Position kingPos = board.findKing(aiColor);
+                                // Vérifie si le roi est en échec après le mouvement
                                 boolean inCheck = board.isUnderAttack(kingPos, getOppositeColor(aiColor));
+                                // Annule le mouvement temporaire
                                 board.undoLastMove();
 
+                                // Si le roi n'est pas en échec, ajoute le mouvement à la liste des coups légaux
                                 if (!inCheck) {
                                     legalMoves.add(new Move(piece, from, to, board.getPiece(to)));
                                 }
@@ -167,29 +179,37 @@ public class GameController implements ChessController {
             }
         }
 
+        // Si aucun coup légal n'est trouvé, affiche un message d'erreur
         if (legalMoves.isEmpty()) {
-           this.view.showError("L'IA n'a aucun coup légal à jouer !");
+            this.view.showError("L'IA n'a aucun coup légal à jouer !");
             return;
         }
 
+        // Sélectionne un coup aléatoire parmi les coups légaux
         var random = new Random();
         Move selectedMove = legalMoves.get(random.nextInt(legalMoves.size()));
-        
+
+        // Effectue le coup sélectionné
         boolean moveSuccess = game.makeMove(selectedMove.getFrom(), selectedMove.getTo());
         if (moveSuccess) {
+            // Affiche un message indiquant le coup joué par l'IA
             this.view.showMessage("L'IA (" + aiColor + ") a déplacé " +
                 selectedMove.getPiece() + " de " + selectedMove.getFrom() + " vers " + selectedMove.getTo());
-                
+
+            // Vérifie si la pièce déplacée est un pion et si elle doit être promue
             Piece movedPiece = board.getPiece(selectedMove.getTo());
             if (movedPiece.getType() == PieceType.PAWN && (selectedMove.getTo().getRow() == 0 || selectedMove.getTo().getRow() == 7)) {
                 game.promotePawn(selectedMove.getTo(), PieceType.QUEEN);
             }
 
+            // Met à jour le statut du jeu
             updateGameStatus();
         } else {
+            // Affiche un message d'erreur si le coup n'a pas pu être joué
             this.view.showError("L'IA n'a pas pu jouer le coup sélectionné.");
         }
     }
+
 
     /**
      * Retourne la couleur opposée à la couleur donnée.
