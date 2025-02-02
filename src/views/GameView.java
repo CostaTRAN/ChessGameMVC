@@ -106,7 +106,7 @@ public class GameView implements ChessView, Observer {
                 Game.getStatus() == GameStatus.CHECK) {
 
             if ((Game.getPlayerColor() != Game.getCurrentTurn()) && Game.getAiEnabled()) {
-                System.out.print("\nTour de l'IA");
+                System.out.print("\nAI's turn");
                 this.gameController.playRandomMove();
             }
             else {

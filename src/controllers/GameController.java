@@ -181,7 +181,7 @@ public class GameController implements ChessController {
 
         // Si aucun coup légal n'est trouvé, affiche un message d'erreur
         if (legalMoves.isEmpty()) {
-            this.view.showError("L'IA n'a aucun coup légal à jouer !");
+            this.view.showError("AI couldn't find any legal moves!");
             return;
         }
 
@@ -193,8 +193,8 @@ public class GameController implements ChessController {
         boolean moveSuccess = game.makeMove(selectedMove.getFrom(), selectedMove.getTo());
         if (moveSuccess) {
             // Affiche un message indiquant le coup joué par l'IA
-            this.view.showMessage("L'IA (" + aiColor + ") a déplacé " +
-                selectedMove.getPiece() + " de " + selectedMove.getFrom() + " vers " + selectedMove.getTo());
+            this.view.showMessage("AI (" + aiColor + ") has moved " +
+                selectedMove.getPiece() + " from " + selectedMove.getFrom() + " to " + selectedMove.getTo());
 
             // Vérifie si la pièce déplacée est un pion et si elle doit être promue
             Piece movedPiece = board.getPiece(selectedMove.getTo());
@@ -206,7 +206,7 @@ public class GameController implements ChessController {
             updateGameStatus();
         } else {
             // Affiche un message d'erreur si le coup n'a pas pu être joué
-            this.view.showError("L'IA n'a pas pu jouer le coup sélectionné.");
+            this.view.showError("AI couldn't play the move!");
         }
     }
 
