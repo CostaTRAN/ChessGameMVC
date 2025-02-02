@@ -24,7 +24,12 @@ public class GameModeSelectionController implements ChessController {
         this.view = view;
     }
 
-    private void setPlayerColor(String input){
+    /**
+     * Définit la couleur du joueur en fonction de l'entrée utilisateur.
+     *
+     * @param input l'entrée utilisateur pour choisir la couleur.
+     */
+    private void setPlayerColor(String input) {
         switch (input) {
             case "w":
                 Game.setPlayerColor(Color.WHITE);
@@ -45,6 +50,8 @@ public class GameModeSelectionController implements ChessController {
      * Gère les commandes de sélection du mode de jeu.
      * Cette méthode entre dans une boucle pour demander à l'utilisateur de choisir un mode de jeu
      * jusqu'à ce qu'une commande valide soit entrée.
+     *
+     * @param command la commande entrée par l'utilisateur.
      */
     @Override
     public void handleCommand(String command) {
