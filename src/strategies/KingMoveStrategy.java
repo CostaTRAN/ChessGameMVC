@@ -54,7 +54,6 @@ public class KingMoveStrategy implements MoveStrategy {
                         return false;
                     }
                 }
-                // Note: Il faudrait également vérifier si le roi passe par une case en échec
                 return true;
             }
         }

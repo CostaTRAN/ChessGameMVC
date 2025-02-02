@@ -55,7 +55,6 @@ public class PawnMoveStrategy implements MoveStrategy {
         else if (colDiff == 1 && rowDiff == direction) {
             Piece targetPiece = Game.getGameInstance().getBoard().getPiece(newPosition);
             return targetPiece != null && targetPiece.getColor() != color;
-            // Note: La prise en passant pourrait être implémentée ici
         }
         return false;
     }

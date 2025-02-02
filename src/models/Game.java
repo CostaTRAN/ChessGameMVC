@@ -209,6 +209,7 @@ public class Game implements Subject {
         if (pawn.getType() == PieceType.PAWN) {
             Piece promotedPiece = new Piece(newType, pawn.getColor(), position);
             this.board.setPiece(position, promotedPiece);
+            this.notifyObservers();
         }
     }
 
